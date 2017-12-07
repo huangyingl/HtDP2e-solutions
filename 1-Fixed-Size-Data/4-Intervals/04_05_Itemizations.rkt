@@ -261,3 +261,52 @@
 ;; interpretation. Now that you have solved the exercises in this section,
 ;; solve them again using the first interpretation of the word.
 ;; Compare and contrast the solutions.
+
+;; Last one: (place-image ROCKET 10 (- x CENTER) BACKG)
+;; This one: (place-image ROCKET 10 (- HEIGHT x) BACKG)
+(define HEIGHT 300) ; distances in pixels 
+(define WIDTH  100)
+(define YDELTA 3)
+ 
+(define BACKG  (empty-scene WIDTH HEIGHT))
+(define ROCKET (rectangle 5 30 "solid" "red"))
+ 
+(define CENTER (/ (image-height ROCKET) 2))
+
+(define (f x)
+  (place-image ROCKET 10 (- HEIGHT x) BACKG)) ;different
+
+(define (show x)
+  (cond
+    [(string? x)
+     (f CENTER)] ;different
+    [(<= -3 x -1)
+     (place-image (text (number->string x) 20 "red")
+                  10 (* 3/4 WIDTH)
+                  (f CENTER))] ;different
+    [(>= x 0)
+     (f x)]))
+ 
+(define (launch x ke)
+  (cond
+    [(string? x) (if (string=? " " ke) -3 x)]
+    [(<= -3 x -1) x]
+    [(>= x 0) x]))
+
+(define (fly x)
+  (cond
+    [(string? x) x]
+    [(<= -3 x -1) (if (= x -1) CENTER (+ x 1))] ;different
+    [(>= x 0) (+ x YDELTA)])) ;different
+
+(define (end? x)
+  (if (number? x)
+      (= x (- HEIGHT CENTER)) ;different
+      #F))
+
+(define (main1 s)
+  (big-bang s
+    [to-draw show]
+    [on-key launch]
+    [on-tick fly]
+    [stop-when end?]))
